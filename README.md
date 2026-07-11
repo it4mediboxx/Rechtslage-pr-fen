@@ -1,2 +1,3 @@
-# Rechtslage-pr-fen
-Wie kann jeder seine Rechtslage prüfen anhand hochlade Bahre, Nachweise, Kommunikationswege, E-Mail-Verkehr, Belege und sonstige, umso laut deutschem Gesetz, die Rechtslage für ein Selbst zu prüfen. Kostenfrei.
+# Rechtslage-prüfen 
+
+kostenfrei mein Lager im Rechtsstreit prüfen  Rechtslage prüfen anhand hochladbrer Files Belege, Nachweise, Kommunikationswege, E-Mail-Verkehr, schriftverkehr oder faxe und sonstige,um laut deutscher Gesetzestexte die Rechtslage für ein selbst zu prüfen. Angsben lhne Gewähr Kostenfrei.
