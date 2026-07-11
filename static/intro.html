@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rechtslage · Film-Vorschau</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230A2540'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='Georgia'%3E§%3C/text%3E%3C/svg%3E">
+<style>
+/* =====================================================================
+   Kino-Vorschau · dieselben zwei Farben wie die App:
+   Porzellanweiß #FFFFFF · Tiefblau #0A2540 (nur Alpha-Abstufungen)
+   ===================================================================== */
+:root {
+  --weiss: #ffffff;
+  --blau: #0a2540;
+  --schrift: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI",
+             Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  font-family: var(--schrift); background: var(--blau); color: var(--weiss);
+  overflow: hidden; -webkit-font-smoothing: antialiased;
+  display: grid; place-items: center;
+}
+
+/* --- Startdeckel (Browser verlangen eine Geste für Ton) --- */
+#deckel {
+  position: fixed; inset: 0; z-index: 60; display: grid; place-items: center;
+  background: radial-gradient(1200px 700px at 50% 42%, rgba(255,255,255,.10), transparent 60%), var(--blau);
+  text-align: center; transition: opacity .5s ease;
+}
+#deckel.weg { opacity: 0; pointer-events: none; }
+#deckel .para { font: 700 92px/1 Georgia, serif; opacity: .95; }
+#deckel h1 { font-size: clamp(30px, 5vw, 52px); font-weight: 700; letter-spacing: -.03em; margin: 18px 0 8px; }
+#deckel p { color: rgba(255,255,255,.65); font-size: 16px; margin-bottom: 30px; }
+.play {
+  cursor: pointer; border: 0; font: 600 17px/1 var(--schrift);
+  background: var(--weiss); color: var(--blau);
+  padding: 17px 40px; border-radius: 980px;
+  transition: transform .3s cubic-bezier(.28,.11,.32,1), box-shadow .3s;
+}
+.play:hover { transform: scale(1.05); box-shadow: 0 18px 50px rgba(255,255,255,.25); }
+.leise { display: block; margin: 18px auto 0; background: none; border: 0; color: rgba(255,255,255,.55);
+  font: 500 13px var(--schrift); cursor: pointer; text-decoration: underline; }
+
+/* --- Bühne --- */
+#buehne { position: fixed; inset: 0; perspective: 1200px; overflow: hidden; }
+.licht {
+  position: absolute; inset: -20%;
+  background: radial-gradient(900px 600px at 50% 40%, rgba(255,255,255,.14), transparent 62%);
+  opacity: 0; transition: opacity 1.4s ease;
+}
+.szene { position: absolute; inset: 0; display: grid; place-items: center; transform-style: preserve-3d; }
+
+/* schwebende Partikel (Paragraphenzeichen) */
+.staub { position: absolute; font: 700 22px Georgia, serif; color: rgba(255,255,255,.10);
+  animation: schweben 7s ease-in-out infinite; }
+@keyframes schweben {
+  0%, 100% { transform: translateY(0) rotate(-8deg); }
+  50% { transform: translateY(-26px) rotate(8deg); }
+}
+
+/* --- 3D-App-Karte --- */
+#app3d {
+  position: relative; width: min(620px, 72vw); aspect-ratio: 16 / 10.5;
+  transform-style: preserve-3d;
+  transform: rotateX(58deg) rotateZ(-16deg) translateZ(-500px) scale(.5);
+  opacity: 0;
+  transition: transform 2.2s cubic-bezier(.22,.9,.3,1), opacity 1.2s ease;
+}
+#app3d.da { opacity: 1; transform: rotateX(9deg) rotateY(-14deg) translateZ(0) scale(1); }
+#app3d.dreht { animation: kreisen 6s ease-in-out infinite; }
+@keyframes kreisen {
+  0%, 100% { transform: rotateX(9deg) rotateY(-14deg) translateZ(0) scale(1); }
+  50% { transform: rotateX(6deg) rotateY(11deg) translateZ(24px) scale(1.02); }
+}
+.fenster {
+  position: absolute; inset: 0; background: var(--weiss); border-radius: 20px;
+  box-shadow: 0 60px 120px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.35);
+  color: var(--blau); overflow: hidden; transform: translateZ(0);
+}
+.fenster .kopf { height: 12%; border-bottom: 1px solid rgba(10,37,64,.12);
+  display: flex; align-items: center; gap: 8px; padding: 0 4%; }
+.fenster .kopf b { font-size: clamp(11px, 1.5vw, 15px); letter-spacing: -.02em; }
+.punkt { width: 9px; height: 9px; border-radius: 50%; background: rgba(10,37,64,.22); }
+.fenster .rumpf { padding: 5% 4%; }
+.zeile { height: 9px; border-radius: 5px; background: rgba(10,37,64,.12); margin: 3.2% 0; }
+.zeile.b { width: 62%; background: rgba(10,37,64,.28); height: 13px; }
+.zeile.k { width: 38%; }
+.pillen { display: flex; gap: 6px; margin: 4% 0; }
+.pille { font: 600 clamp(8px,1.2vw,11px)/1 var(--schrift); background: var(--blau); color: var(--weiss);
+  padding: 5px 10px; border-radius: 980px; opacity: 0; transform: translateY(8px);
+  transition: opacity .5s ease, transform .5s ease; }
+#app3d.dreht .pille { opacity: 1; transform: none; }
+.pille:nth-child(2) { transition-delay: .25s; } .pille:nth-child(3) { transition-delay: .5s; }
+
+/* Fortschrittsring über der Karte */
+.ring { position: absolute; top: -14%; right: -8%; width: 24%; aspect-ratio: 1;
+  transform: translateZ(70px); opacity: 0; transition: opacity .6s ease; }
+.ring.da { opacity: 1; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring circle { fill: rgba(10,37,64,.92); }
+.ring .spur { fill: none; stroke: rgba(255,255,255,.2); stroke-width: 7; }
+.ring .lauf { fill: none; stroke: #fff; stroke-width: 7; stroke-linecap: round;
+  stroke-dasharray: 264; stroke-dashoffset: 264; }
+.ring.laeuft .lauf { transition: stroke-dashoffset 3.4s cubic-bezier(.4,0,.3,1); stroke-dashoffset: 0; }
+.ring text { fill: #fff; font: 700 15px var(--schrift); transform: rotate(90deg); transform-origin: 50px 50px; }
+
+/* schwebende Tipps */
+.tipp {
+  position: absolute; font: 600 clamp(11px, 1.6vw, 14px)/1.35 var(--schrift);
+  background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.28);
+  backdrop-filter: blur(8px); color: var(--weiss);
+  padding: 11px 18px; border-radius: 14px; max-width: 240px;
+  opacity: 0; transform: translateY(18px) translateZ(90px);
+  transition: opacity .6s ease, transform .6s cubic-bezier(.22,.9,.3,1);
+}
+.tipp.da { opacity: 1; transform: translateY(0) translateZ(90px); }
+.tipp b { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; opacity: .6; margin-bottom: 3px; }
+
+/* --- Kunde (SVG-Gesicht) --- */
+#kunde { position: absolute; bottom: 6%; left: 6%; width: clamp(110px, 15vw, 170px);
+  opacity: 0; transform: translateY(30px); transition: opacity .8s ease, transform .8s ease; }
+#kunde.da { opacity: 1; transform: none; }
+#kunde .braue { transition: transform .45s ease; transform-origin: center; }
+#kunde .auge { transition: transform .45s ease; }
+#kunde .pupille { transition: transform .5s ease; }
+#kunde .mund { transition: d .45s ease; }
+/* prüfend: Pupillen wandern */
+#kunde.prueft .pupille { animation: lesen 1.6s ease-in-out infinite; }
+@keyframes lesen { 0%,100% { transform: translateX(-3px); } 50% { transform: translateX(3.5px); } }
+/* gespannt: Brauen hoch, Augen weit */
+#kunde.gespannt .braue.l { transform: translateY(-5px) rotate(-8deg); }
+#kunde.gespannt .braue.r { transform: translateY(-5px) rotate(8deg); }
+#kunde.gespannt .auge { transform: scale(1.25); transform-origin: center; }
+#kunde.gespannt { animation: zittern .18s linear infinite; }
+@keyframes zittern { 0%,100% { transform: translateX(0); } 50% { transform: translateX(1.2px); } }
+/* begeistert */
+#kunde.freut .braue { transform: translateY(-4px); }
+.sprechblase { position: absolute; bottom: 105%; left: 55%; white-space: nowrap;
+  font: 600 13px var(--schrift); background: var(--weiss); color: var(--blau);
+  padding: 8px 14px; border-radius: 14px 14px 14px 3px;
+  opacity: 0; transform: translateY(8px) scale(.9); transition: all .4s cubic-bezier(.22,.9,.3,1); }
+.sprechblase.da { opacity: 1; transform: none; }
+
+/* --- Sterne-Bewertung --- */
+#bewertung { position: absolute; top: 12%; left: 50%; transform: translateX(-50%);
+  display: flex; gap: clamp(6px, 1.4vw, 14px); z-index: 5; }
+.stern { width: clamp(34px, 6vw, 60px); aspect-ratio: 1; opacity: 0;
+  transform: scale(3) rotate(-40deg); filter: drop-shadow(0 10px 30px rgba(255,255,255,.35)); }
+.stern.da { animation: einschlag .45s cubic-bezier(.2,1.4,.4,1) forwards; }
+@keyframes einschlag { to { opacity: 1; transform: scale(1) rotate(0); } }
+.stern path { fill: var(--weiss); }
+
+/* --- Finale: Slogan --- */
+#finale { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center;
+  background: var(--blau); opacity: 0; pointer-events: none; transition: opacity .9s ease; text-align: center; }
+#finale.da { opacity: 1; pointer-events: auto; }
+#finale .para { font: 700 64px/1 Georgia, serif; opacity: 0; transform: scale(2.4);
+  transition: all .7s cubic-bezier(.2,1.3,.4,1); }
+#finale.da .para { opacity: .95; transform: none; }
+#finale h2 { font-size: clamp(34px, 6.5vw, 72px); font-weight: 700; letter-spacing: -.03em;
+  margin: 22px 0 10px; opacity: 0; transform: translateY(26px); transition: all .8s .35s cubic-bezier(.22,.9,.3,1); }
+#finale.da h2 { opacity: 1; transform: none; }
+#finale .slogan { font-size: clamp(17px, 2.6vw, 26px); color: rgba(255,255,255,.72);
+  letter-spacing: -.01em; opacity: 0; transition: opacity .9s .9s ease; }
+#finale.da .slogan { opacity: 1; }
+#finale .aktionen { margin-top: 40px; opacity: 0; transition: opacity .8s 1.6s ease; display: flex; gap: 14px; justify-content: center; }
+#finale.da .aktionen { opacity: 1; }
+.nochmal { cursor: pointer; border: 0; font: 600 15px var(--schrift); background: transparent;
+  color: var(--weiss); padding: 15px 30px; border-radius: 980px; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.6); }
+.nochmal:hover { background: rgba(255,255,255,.1); }
+a.start { text-decoration: none; font: 600 15px var(--schrift); background: var(--weiss);
+  color: var(--blau); padding: 15px 34px; border-radius: 980px; display: inline-block; }
+a.start:hover { transform: scale(1.04); }
+
+/* Überspringen */
+#skip { position: fixed; right: 22px; bottom: 20px; z-index: 55; border: 0; cursor: pointer;
+  font: 600 12px var(--schrift); color: rgba(255,255,255,.55); background: rgba(255,255,255,.08);
+  padding: 9px 16px; border-radius: 980px; opacity: 0; transition: opacity .5s; }
+#skip.da { opacity: 1; }
+#skip:hover { color: #fff; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition-duration: .01s !important; }
+}
+</style>
+</head>
+<body>
+
+<div id="deckel">
+  <div>
+    <div class="para">§</div>
+    <h1>Rechtslage – die Film-Vorschau</h1>
+    <p>≈ 9 Sekunden · mit Musik und Kinosound</p>
+    <button class="play" id="play">▶&ensp;Vorschau abspielen</button>
+    <button class="leise" id="playLeise">Ohne Ton abspielen</button>
+  </div>
+</div>
+
+<div id="buehne">
+  <div class="licht" id="licht"></div>
+  <div class="szene">
+    <div id="app3d">
+      <div class="fenster">
+        <div class="kopf"><span class="punkt"></span><span class="punkt"></span><span class="punkt"></span>
+          <b>&nbsp;§ Rechtslage · Fallakte</b></div>
+        <div class="rumpf">
+          <div class="zeile b"></div>
+          <div class="zeile"></div><div class="zeile k"></div>
+          <div class="pillen"><span class="pille">BGB § 536</span><span class="pille">BGB § 556</span><span class="pille">KSchG § 4</span></div>
+          <div class="zeile"></div><div class="zeile k"></div>
+        </div>
+      </div>
+      <div class="ring" id="ring">
+        <svg viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="50"></circle>
+          <circle class="spur" cx="50" cy="50" r="42"></circle>
+          <circle class="lauf" cx="50" cy="50" r="42"></circle>
+          <text x="50" y="55" text-anchor="middle">prüft…</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="tipp" id="tipp1" style="top:16%; left:8%"><b>Tipp 1</b>Fristen werden automatisch aus deinen Dokumenten erkannt.</div>
+    <div class="tipp" id="tipp2" style="top:34%; right:6%"><b>Tipp 2</b>Jede Einschätzung zitiert echte Gesetzestexte mit Fassungsstand.</div>
+    <div class="tipp" id="tipp3" style="bottom:14%; right:12%"><b>Tipp 3</b>Fertige Schreiben in einem Klick – geprüft und verschlüsselt.</div>
+  </div>
+
+  <div id="kunde">
+    <div class="sprechblase" id="blase">Hmm … was sagt das Gesetz?</div>
+    <svg viewBox="0 0 120 120">
+      <circle cx="60" cy="60" r="52" fill="#ffffff"></circle>
+      <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(10,37,64,.2)" stroke-width="2"></circle>
+      <path class="braue l" d="M32 42 Q42 36 52 41" stroke="#0a2540" stroke-width="4" fill="none" stroke-linecap="round"></path>
+      <path class="braue r" d="M68 41 Q78 36 88 42" stroke="#0a2540" stroke-width="4" fill="none" stroke-linecap="round"></path>
+      <g class="auge"><circle cx="43" cy="55" r="7.5" fill="none" stroke="#0a2540" stroke-width="3"></circle>
+        <circle class="pupille" cx="43" cy="55" r="3.4" fill="#0a2540"></circle></g>
+      <g class="auge"><circle cx="77" cy="55" r="7.5" fill="none" stroke="#0a2540" stroke-width="3"></circle>
+        <circle class="pupille" cx="77" cy="55" r="3.4" fill="#0a2540"></circle></g>
+      <path class="mund" id="mund" d="M46 82 Q60 84 74 82" stroke="#0a2540" stroke-width="4" fill="none" stroke-linecap="round"></path>
+    </svg>
+  </div>
+
+  <div id="bewertung"></div>
+</div>
+
+<div id="finale">
+  <div>
+    <div class="para">§</div>
+    <h2>Rechtslage. Klar geprüft.</h2>
+    <p class="slogan">Dein Recht. Schwarz auf Weiß – in Minuten statt Wochen.</p>
+    <div class="aktionen">
+      <a class="start" href="/">App starten</a>
+      <button class="nochmal" onclick="location.reload()">Noch einmal ansehen</button>
+    </div>
+  </div>
+</div>
+
+<button id="skip" onclick="location.href='/'">Überspringen →</button>
+
+<script>
+"use strict";
+/* ============================================================
+   Regie: ~9,5 s Choreografie + generierter Soundtrack (WebAudio)
+   0,0–1,4  Licht an, Riser beginnt
+   0,8–3,2  3D-App fliegt ein, Kunde erscheint, prüft (Pupillen wandern)
+   2,2–5,6  Tipps 1–3, Puls-Beat, Fortschrittsring läuft
+   5,6–6,6  Spannung: gespannte Mimik, Musik zieht an
+   6,6–8,2  KINOSCHLAG: 5 Sterne schlagen ein, Kunde strahlt
+   8,2–9,5  Finale: Slogan + Schlussakkord
+   ============================================================ */
+
+const $ = (id) => document.getElementById(id);
+let audio = null;
+
+function ton(mit) {
+  if (!mit) return null;
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const master = ctx.createGain(); master.gain.value = 0.55; master.connect(ctx.destination);
+  const t0 = ctx.currentTime + 0.05;
+
+  const osz = (typ, freq, start, dauer, spitze, ziel) => {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = typ; o.frequency.setValueAtTime(freq, t0 + start);
+    if (ziel) o.frequency.exponentialRampToValueAtTime(ziel, t0 + start + dauer);
+    g.gain.setValueAtTime(0.0001, t0 + start);
+    g.gain.exponentialRampToValueAtTime(spitze, t0 + start + Math.min(0.4, dauer / 3));
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + start + dauer);
+    o.connect(g); g.connect(master);
+    o.start(t0 + start); o.stop(t0 + start + dauer + 0.1);
+  };
+  const rauschen = (start, dauer, spitze, tiefpass) => {
+    const puffer = ctx.createBuffer(1, ctx.sampleRate * dauer, ctx.sampleRate);
+    const d = puffer.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+    const q = ctx.createBufferSource(); q.buffer = puffer;
+    const f = ctx.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = tiefpass;
+    const g = ctx.createGain(); g.gain.value = spitze;
+    q.connect(f); f.connect(g); g.connect(master); q.start(t0 + start);
+  };
+
+  /* Grunddrohne + Riser (0–6,6 s): dunkel, kinoartig */
+  osz("sine", 55, 0, 6.8, 0.30);
+  osz("sawtooth", 110, 0, 6.8, 0.05, 220);          // langsam steigende Spannung
+  osz("sawtooth", 110.7, 0, 6.8, 0.05, 221.5);      // leicht verstimmt = Filmschwebung
+  /* Herzschlag-Puls während der Prüfung */
+  for (let i = 0; i < 7; i++) osz("sine", 72, 1.2 + i * 0.75, 0.22, 0.22);
+  /* Ticks zu den Tipps */
+  [2.3, 3.4, 4.5].forEach(s => osz("triangle", 1320, s, 0.09, 0.12));
+  /* Spannungs-Tremolo (5,6–6,6 s) */
+  for (let i = 0; i < 8; i++) osz("sawtooth", 165 + i * 14, 5.6 + i * 0.12, 0.3, 0.05);
+  /* KINOSCHLAG bei 6,6 s: Sub-Boom + Crash */
+  osz("sine", 150, 6.6, 1.3, 0.9, 38);
+  rauschen(6.6, 1.4, 0.5, 3200);
+  /* Sterne-Pings */
+  [6.85, 7.1, 7.35, 7.6, 7.85].forEach((s, i) => osz("triangle", 880 + i * 140, s, 0.35, 0.2));
+  /* Schlussakkord (8,2 s): Dur, warm */
+  [262, 330, 392, 523].forEach(f => osz("sine", f, 8.2, 2.6, 0.16));
+  osz("sine", 65.4, 8.2, 2.8, 0.25);
+  return ctx;
+}
+
+function film(mitTon) {
+  $("deckel").classList.add("weg");
+  $("skip").classList.add("da");
+  audio = ton(mitTon);
+
+  /* Staub-Paragraphen zufällig verteilen */
+  const szene = document.querySelector(".szene");
+  for (let i = 0; i < 14; i++) {
+    const s = document.createElement("span");
+    s.className = "staub"; s.textContent = "§";
+    s.style.left = Math.random() * 96 + "%";
+    s.style.top = Math.random() * 92 + "%";
+    s.style.animationDelay = (Math.random() * -7) + "s";
+    s.style.fontSize = (14 + Math.random() * 22) + "px";
+    szene.appendChild(s);
+  }
+
+  const zeit = (ms, fn) => setTimeout(fn, ms);
+  const kunde = $("kunde"), mund = $("mund");
+
+  zeit(100,  () => $("licht").style.opacity = 1);
+  zeit(800,  () => { $("app3d").classList.add("da"); });
+  zeit(1400, () => { kunde.classList.add("da", "prueft"); $("blase").classList.add("da"); });
+  zeit(2600, () => $("app3d").classList.add("dreht"));
+  zeit(2300, () => $("tipp1").classList.add("da"));
+  zeit(3400, () => $("tipp2").classList.add("da"));
+  zeit(4500, () => $("tipp3").classList.add("da"));
+  zeit(2200, () => { $("ring").classList.add("da"); requestAnimationFrame(() => $("ring").classList.add("laeuft")); });
+
+  /* Spannung */
+  zeit(5600, () => {
+    kunde.classList.remove("prueft"); kunde.classList.add("gespannt");
+    $("blase").textContent = "Und …?!";
+    mund.setAttribute("d", "M50 84 Q60 79 70 84");            // angespannter Mund
+    document.querySelector("#ring text").textContent = "…";
+  });
+
+  /* Kinoschlag + Sterne */
+  zeit(6600, () => {
+    kunde.classList.remove("gespannt"); kunde.classList.add("freut");
+    mund.setAttribute("d", "M44 78 Q60 96 76 78");            // strahlendes Lächeln
+    $("blase").textContent = "★★★★★ Alles klar!";
+    document.querySelector("#ring text").textContent = "✓";
+    const bewertung = $("bewertung");
+    const sternPfad = "M50 6 L61 38 L95 38 L67 58 L78 92 L50 71 L22 92 L33 58 L5 38 L39 38 Z";
+    for (let i = 0; i < 5; i++) {
+      const w = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      w.setAttribute("viewBox", "0 0 100 100"); w.classList.add("stern");
+      w.innerHTML = `<path d="${sternPfad}"></path>`;
+      bewertung.appendChild(w);
+      zeit(250 * i + 200, () => w.classList.add("da"));
+    }
+    /* Kamera-Wackler beim Einschlag */
+    document.body.animate(
+      [{ transform: "translate(0,0)" }, { transform: "translate(-7px,5px)" },
+       { transform: "translate(6px,-4px)" }, { transform: "translate(-3px,2px)" },
+       { transform: "translate(0,0)" }],
+      { duration: 450, easing: "ease-out" });
+  });
+
+  /* Finale mit Slogan */
+  zeit(8200, () => { $("finale").classList.add("da"); $("skip").classList.remove("da"); });
+}
+
+$("play").addEventListener("click", () => film(true));
+$("playLeise").addEventListener("click", () => film(false));
+</script>
+</body>
+</html>

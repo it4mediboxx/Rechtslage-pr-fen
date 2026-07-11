@@ -1,0 +1,304 @@
+/* ==========================================================================
+   Rechtslage · Design-System
+   Zwei Farben, konsequent durchgezogen:
+     · Porzellanweiß  #FFFFFF
+     · Tiefblau       #0A2540  (alle Grautöne sind Alpha-Abstufungen davon)
+   Typografie und Rhythmus orientieren sich an apple.com: große, eng
+   gesetzte Headlines, ruhige Flächen, weiche Radien, dezente Bewegung.
+   ========================================================================== */
+
+:root {
+  --weiss: #ffffff;
+  --blau: #0a2540;
+  --blau-hover: #163a5f;          /* Abstufung derselben Farbe */
+  --tinte-2: rgba(10, 37, 64, .64);
+  --tinte-3: rgba(10, 37, 64, .44);
+  --linie: rgba(10, 37, 64, .12);
+  --flaeche: rgba(10, 37, 64, .045);
+  --flaeche-2: rgba(10, 37, 64, .08);
+  --schatten: 0 2px 8px rgba(10, 37, 64, .06), 0 12px 32px rgba(10, 37, 64, .07);
+  --radius: 18px;
+  --radius-pille: 980px;
+  --uebergang: .3s cubic-bezier(.28, .11, .32, 1);
+  --schrift: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+             "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--schrift);
+  font-size: 17px;
+  line-height: 1.47;
+  letter-spacing: -.012em;
+  color: var(--blau);
+  background: var(--weiss);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* --- Navigation ---------------------------------------------------------- */
+
+.nav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(255, 255, 255, .72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--linie);
+}
+.nav-inner {
+  max-width: 1024px; margin: 0 auto; padding: 0 22px;
+  height: 52px; display: flex; align-items: center; justify-content: space-between;
+}
+.marke {
+  font-size: 19px; font-weight: 700; letter-spacing: -.02em;
+  color: var(--blau); text-decoration: none;
+}
+.nav-links { display: flex; gap: 28px; }
+.nav-links a {
+  color: var(--tinte-2); text-decoration: none; font-size: 14px;
+  transition: color var(--uebergang);
+}
+.nav-links a:hover, .nav-links a.aktiv { color: var(--blau); }
+
+/* --- Hinweisband (rechtlicher Rahmen, überall sichtbar) ------------------ */
+
+.hinweisband {
+  background: var(--blau); color: var(--weiss);
+  text-align: center; font-size: 12px; letter-spacing: .01em;
+  padding: 8px 20px; opacity: .97;
+}
+
+/* --- Layout --------------------------------------------------------------- */
+
+.inhalt { max-width: 1024px; margin: 0 auto; padding: 0 22px 96px; min-height: 62vh; }
+
+.held {
+  text-align: center; padding: 88px 0 56px;
+  animation: erscheinen .7s var(--uebergang) both;
+}
+.held h1 {
+  font-size: clamp(44px, 7vw, 76px);
+  font-weight: 700; letter-spacing: -.03em; line-height: 1.04;
+}
+.held p.unterzeile {
+  margin: 18px auto 0; max-width: 640px;
+  font-size: clamp(19px, 2.4vw, 24px); color: var(--tinte-2);
+  letter-spacing: -.015em;
+}
+.held .aktionen { margin-top: 34px; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+@keyframes erscheinen {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.abschnitt { padding: 40px 0; animation: erscheinen .55s var(--uebergang) both; }
+.abschnitt h2 {
+  font-size: clamp(26px, 3.6vw, 38px); font-weight: 700;
+  letter-spacing: -.025em; margin-bottom: 8px;
+}
+.abschnitt .beschreibung { color: var(--tinte-2); margin-bottom: 28px; max-width: 640px; }
+
+/* --- Buttons --------------------------------------------------------------- */
+
+.knopf {
+  display: inline-block; border: 0; cursor: pointer;
+  font: 600 15px/1 var(--schrift); letter-spacing: -.01em;
+  padding: 13px 26px; border-radius: var(--radius-pille);
+  background: var(--blau); color: var(--weiss);
+  text-decoration: none; text-align: center;
+  transition: background var(--uebergang), transform var(--uebergang), box-shadow var(--uebergang);
+}
+.knopf:hover { background: var(--blau-hover); transform: translateY(-1px); box-shadow: var(--schatten); }
+.knopf:active { transform: none; }
+.knopf.sekundaer {
+  background: transparent; color: var(--blau);
+  box-shadow: inset 0 0 0 1.5px var(--blau);
+}
+.knopf.sekundaer:hover { background: var(--flaeche); }
+.knopf.klein { padding: 9px 18px; font-size: 13px; }
+.knopf[disabled] { opacity: .4; pointer-events: none; }
+
+/* --- Karten ---------------------------------------------------------------- */
+
+.kartenraster { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 18px; }
+.karte {
+  background: var(--weiss); border: 1px solid var(--linie);
+  border-radius: var(--radius); padding: 26px;
+  transition: transform var(--uebergang), box-shadow var(--uebergang);
+}
+a.karte { display: block; color: inherit; text-decoration: none; cursor: pointer; }
+a.karte:hover { transform: translateY(-3px); box-shadow: var(--schatten); }
+.karte .etikett {
+  display: inline-block; font-size: 11px; font-weight: 600;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: var(--tinte-3); margin-bottom: 10px;
+}
+.karte h3 { font-size: 21px; font-weight: 700; letter-spacing: -.02em; }
+.karte .meta { margin-top: 8px; font-size: 14px; color: var(--tinte-2); }
+
+.leer {
+  text-align: center; padding: 70px 20px; color: var(--tinte-2);
+  border: 1.5px dashed var(--linie); border-radius: var(--radius);
+}
+
+/* --- Status-Punkte / Abzeichen ---------------------------------------------- */
+
+.abzeichen {
+  display: inline-block; font-size: 12px; font-weight: 600;
+  padding: 4px 12px; border-radius: var(--radius-pille);
+  background: var(--flaeche-2); color: var(--blau);
+}
+.abzeichen.invers { background: var(--blau); color: var(--weiss); }
+.abzeichen.hohl { background: transparent; box-shadow: inset 0 0 0 1px var(--linie); color: var(--tinte-2); }
+
+/* --- Formulare --------------------------------------------------------------- */
+
+.formular { max-width: 560px; }
+.feld { margin-bottom: 20px; }
+.feld label {
+  display: block; font-size: 13px; font-weight: 600;
+  color: var(--tinte-2); margin-bottom: 7px; letter-spacing: -.005em;
+}
+.feld input, .feld select, .feld textarea {
+  width: 100%; font: 400 16px/1.4 var(--schrift); color: var(--blau);
+  padding: 13px 16px; border: 1.5px solid var(--linie); border-radius: 12px;
+  background: var(--weiss); outline: none;
+  transition: border-color var(--uebergang), box-shadow var(--uebergang);
+  appearance: none; -webkit-appearance: none;
+}
+.feld select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%230A2540' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 16px center;
+}
+.feld textarea { min-height: 120px; resize: vertical; }
+.feld input:focus, .feld select:focus, .feld textarea:focus {
+  border-color: var(--blau); box-shadow: 0 0 0 4px rgba(10, 37, 64, .1);
+}
+
+/* --- Upload-Zone --------------------------------------------------------------- */
+
+.ablage {
+  border: 1.5px dashed var(--linie); border-radius: var(--radius);
+  padding: 44px 24px; text-align: center; color: var(--tinte-2);
+  cursor: pointer; transition: border-color var(--uebergang), background var(--uebergang);
+}
+.ablage:hover, .ablage.aktiv { border-color: var(--blau); background: var(--flaeche); }
+.ablage strong { color: var(--blau); }
+.ablage .formate { display: block; margin-top: 8px; font-size: 12px; color: var(--tinte-3); }
+
+/* --- Listen (Dokumente, Zeitleiste) --------------------------------------------- */
+
+.zeilenliste { list-style: none; border: 1px solid var(--linie); border-radius: var(--radius); overflow: hidden; }
+.zeilenliste li {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 15px 20px; border-bottom: 1px solid var(--linie);
+  background: var(--weiss); font-size: 15px;
+}
+.zeilenliste li:last-child { border-bottom: 0; }
+.zeilenliste .neben { color: var(--tinte-3); font-size: 13px; white-space: nowrap; }
+
+.zeitleiste { list-style: none; position: relative; padding-left: 26px; }
+.zeitleiste::before {
+  content: ""; position: absolute; left: 7px; top: 6px; bottom: 6px;
+  width: 2px; background: var(--linie);
+}
+.zeitleiste li { position: relative; padding: 0 0 26px; }
+.zeitleiste li::before {
+  content: ""; position: absolute; left: -25px; top: 5px;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--weiss); border: 2.5px solid var(--blau);
+}
+.zeitleiste li.stufe-überfällig::before,
+.zeitleiste li.stufe-kritisch::before { background: var(--blau); }
+.zeitleiste .z-datum { font-weight: 700; letter-spacing: -.01em; }
+.zeitleiste .z-kontext { color: var(--tinte-2); font-size: 14px; margin-top: 3px; max-width: 640px; }
+
+/* --- Tabs ------------------------------------------------------------------------ */
+
+.tabs { display: flex; gap: 6px; margin: 26px 0; flex-wrap: wrap; }
+.tabs button {
+  border: 0; background: transparent; cursor: pointer;
+  font: 600 14px/1 var(--schrift); color: var(--tinte-2);
+  padding: 10px 18px; border-radius: var(--radius-pille);
+  transition: background var(--uebergang), color var(--uebergang);
+}
+.tabs button:hover { color: var(--blau); }
+.tabs button.aktiv { background: var(--blau); color: var(--weiss); }
+
+/* --- Analyse ------------------------------------------------------------------------ */
+
+.fortschritt { height: 6px; border-radius: 3px; background: var(--flaeche-2); overflow: hidden; margin: 18px 0 8px; }
+.fortschritt > div { height: 100%; background: var(--blau); border-radius: 3px; transition: width .5s var(--uebergang); }
+
+.thema { border: 1px solid var(--linie); border-radius: var(--radius); padding: 26px; margin-bottom: 18px; background: var(--weiss); }
+.thema h3 { font-size: 20px; letter-spacing: -.02em; margin-bottom: 12px; }
+.thema .absatz { margin: 10px 0; font-size: 15px; }
+.thema .absatz strong { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--tinte-3); margin-bottom: 3px; }
+.paragraph-pillen { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.paragraph-pille {
+  border: 0; cursor: pointer; font: 600 13px/1 var(--schrift);
+  background: var(--flaeche-2); color: var(--blau);
+  padding: 8px 14px; border-radius: var(--radius-pille);
+  transition: background var(--uebergang), color var(--uebergang);
+}
+.paragraph-pille:hover { background: var(--blau); color: var(--weiss); }
+
+.gesetzestext {
+  background: var(--flaeche); border-radius: var(--radius);
+  padding: 22px 24px; margin: 14px 0; font-size: 15px;
+}
+.gesetzestext h4 { font-size: 16px; margin-bottom: 6px; letter-spacing: -.015em; }
+.gesetzestext .fassung { font-size: 12px; color: var(--tinte-3); margin-bottom: 10px; }
+.gesetzestext a { color: var(--blau); }
+
+.hinweiskasten {
+  border-left: 3px solid var(--blau); background: var(--flaeche);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 16px 20px; margin: 12px 0; font-size: 14px;
+}
+.hinweiskasten.stark { background: var(--blau); color: var(--weiss); border-radius: var(--radius); border-left: 0; }
+.hinweiskasten.stark a { color: var(--weiss); }
+
+/* --- Schreiben ---------------------------------------------------------------------- */
+
+.brief {
+  background: var(--weiss); border: 1px solid var(--linie); border-radius: var(--radius);
+  padding: 40px; white-space: pre-wrap; font-size: 15px; line-height: 1.6;
+  box-shadow: var(--schatten); margin: 18px 0;
+}
+
+/* --- Meldungen ----------------------------------------------------------------------- */
+
+.meldung {
+  position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%);
+  background: var(--blau); color: var(--weiss);
+  padding: 14px 26px; border-radius: var(--radius-pille);
+  font-size: 14px; font-weight: 600; box-shadow: var(--schatten);
+  opacity: 0; pointer-events: none; transition: opacity var(--uebergang), transform var(--uebergang);
+  z-index: 100; max-width: min(90vw, 640px); text-align: center;
+}
+.meldung.sichtbar { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+
+/* --- Fußzeile ---------------------------------------------------------------------- */
+
+.fuss { border-top: 1px solid var(--linie); background: var(--flaeche); }
+.fuss-inner { max-width: 1024px; margin: 0 auto; padding: 44px 22px 56px; font-size: 13px; color: var(--tinte-2); }
+.fuss-marke { font-weight: 700; color: var(--blau); font-size: 15px; margin-bottom: 10px; }
+.fuss-inner p + p { margin-top: 10px; max-width: 640px; }
+.fuss-recht strong { color: var(--blau); }
+
+/* --- Responsiv --------------------------------------------------------------------- */
+
+@media (max-width: 640px) {
+  .held { padding: 56px 0 36px; }
+  .nav-links { gap: 18px; }
+  .brief { padding: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
