@@ -1,3 +1,3 @@
 # Rechtslage-prüfen 
 
-kostenfrei mein Lager im Rechtsstreit prüfen  Rechtslage prüfen anhand hochladbrer Files Belege, Nachweise, Kommunikationswege, E-Mail-Verkehr, schriftverkehr oder faxe und sonstige,um laut deutscher Gesetzestexte die Rechtslage für ein selbst zu prüfen. Angsben lhne Gewähr Kostenfrei.
+kostenfrei meine Rechtlage im Rechtsstreit prüfen un meine Rechtslage anhand hochladbrer Belege, Nachweise, Kommunikationswege, E-Mail-Verkehr, schriftverkehr oder faxe und sonstiges,um laut deutschem Recht für dich selbst besser zu beurteilen. 
